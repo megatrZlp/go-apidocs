@@ -5,10 +5,9 @@
 ## 安装
 
 ```
-go get github.com/yourname/go-apidocs
+go get github.com/megatrZlp/go-apidocs
 ```
 
-（首次发布后，将 `yourname` 替换为你的 GitHub 用户名）
 
 ## 快速开始
 
@@ -18,7 +17,7 @@ package main
 import (
     "github.com/gogf/gf/v2/frame/g"
     "github.com/gogf/gf/v2/os/gfile"
-    "github.com/yourname/go-apidocs"
+    "github.com/megatrZlp/go-apidocs"
 )
 
 func main() {
