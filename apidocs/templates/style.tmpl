@@ -1,0 +1,31 @@
+{{define "style"}}html{scroll-behavior:smooth}*{box-sizing:border-box} body{font-family:Arial, sans-serif;line-height:1.6;margin:0;padding-left:280px}
+.layout{min-height:100vh}
+aside{position:fixed;left:0;top:0;bottom:0;height:100vh;width:280px;background:#f5f7fa;border-right:1px solid #e5e9f2;padding:16px;overflow:auto;z-index:10}
+main{background:#fff;padding:24px;position:relative;z-index:1}
+h1{margin:0 0 12px 0;font-size:20px}
+h2{margin-top:24px;font-size:18px}
+h3{margin-top:16px;font-size:16px}
+h1,h2,h3{scroll-margin-top:12px}
+code,pre{background:#f8f9fb;border:1px solid #e5e9f2;border-radius:6px}
+pre{padding:12px;overflow:auto}
+table{border-collapse:collapse;width:100%;margin:12px 0}
+th,td{border:1px solid #dfe3e8;padding:8px;text-align:left}
+th{background:#fafbfc}
+.endpoint{margin-bottom:32px}
+.method{display:inline-block;background:#eef2ff;color:#3f51b5;border:1px solid #c7d2fe;border-radius:12px;padding:2px 8px;margin-right:6px;font-size:12px}
+.export-fixed{position:fixed;top:10px;right:12px;background:#3f51b5;color:#fff;border:none;border-radius:20px;padding:8px 14px;box-shadow:0 2px 6px rgba(0,0,0,.15);text-decoration:none;z-index:999}
+.nav-top{position:sticky;top:0;background:#f5f7fa;padding:6px 0;margin-bottom:8px;z-index:12;border-bottom:1px solid #e5e9f2}
+.nav details{margin:4px 0}
+.nav summary{cursor:pointer;padding:4px 2px;color:#333;font-size:15px;display:flex;align-items:center;gap:6px}
+.nav summary a{color:#2c2c2c;text-decoration:none}
+.nav summary a:hover{color:#000}
+.nav summary a.active{color:#16C06E;font-weight:600}
+.nav details > summary::before{content:'\25B6';display:inline-block;width:8px;color:#888;margin-right:4px;transition:transform .2s;transform:rotate(0deg);font-size:9px}
+.nav details[open] > summary::before{content:'\25B6';color:#555;transform:rotate(90deg);font-size:9px}
+.nav details.grp > summary{font-weight:600;font-size:17px}
+.nav details.subgrp > summary{padding-left:14px;color:#555;font-size:16px}
+.nav .item{padding-left:28px}
+.nav .item-link{display:block;color:#2c2c2c;text-decoration:none;padding:3px 2px;font-size:14px}
+.nav .item-link::before{content:'•';display:inline-block;margin-right:6px;color:#9aa0a6}
+.nav .item-link.active{color:#16C06E;font-weight:600}
+.nav .item-link.active::before{color:#16C06E}{{end}}

@@ -1,0 +1,29 @@
+{{define "script"}}(function(){
+var exp=document.getElementById('exportMd');
+if(exp){ var qs=location.search; if(qs){ exp.href=exp.getAttribute('href')+qs; } }
+var targets=[];
+document.querySelectorAll('main .endpoint[id], main h2[id]').forEach(function(el){targets.push(el);});
+var io=new IntersectionObserver(function(entries){
+  var vis=entries.filter(function(e){return e.isIntersecting;}).sort(function(a,b){return a.target.offsetTop-b.target.offsetTop;});
+  if(vis.length>0){
+    var hashId=location.hash.slice(1);
+    var endpointVis=vis.filter(function(e){return e.target.classList && e.target.classList.contains('endpoint');});
+    var pickEntry=null;
+    if(endpointVis.length>0){
+      pickEntry=endpointVis.find(function(e){return e.target.id===hashId;}) || endpointVis[0];
+    } else {
+      pickEntry=vis.find(function(e){return e.target.id===hashId;}) || vis[0];
+    }
+    var id=pickEntry.target.id;
+    document.querySelectorAll('aside .nav .item-link').forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+id);});
+    document.querySelectorAll('aside .nav summary a').forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+id);});
+    var link=document.querySelector('aside .nav a[href="#'+id+'"]');
+  }
+},{root:null,rootMargin:'0px 0px -60% 0px',threshold:0.1});
+targets.forEach(function(el){io.observe(el);});
+var start=location.hash.slice(1);
+if(!start){var first=document.querySelector('aside .nav .item-link');if(first){start=first.getAttribute('href').slice(1);}}
+if(start){document.querySelectorAll('aside .nav .item-link').forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+start);});document.querySelectorAll('aside .nav summary a').forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+start);});}
+document.getElementById('expandAll').onclick=function(){document.querySelectorAll('aside .nav details').forEach(function(d){d.open=true;});};
+document.getElementById('collapseAll').onclick=function(){document.querySelectorAll('aside .nav details').forEach(function(d){d.open=false;});};
+})();{{end}}

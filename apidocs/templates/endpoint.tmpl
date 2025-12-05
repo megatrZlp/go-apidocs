@@ -1,0 +1,37 @@
+{{define "endpoint"}}
+<div class="endpoint" id="{{.Anchor}}">
+  <h2><span class="method">{{.MethodUpper}}</span> {{.Summary}}</h2>
+  <h3 id="{{.Anchor}}-url">请求URL</h3>
+  <pre><code>{{.Path}}</code></pre>
+  <h3 id="{{.Anchor}}-method">请求方式</h3>
+  <ul><li>{{.MethodUpper}} <em>Content-Type: {{.ContentType}}</em></li></ul>
+  {{if .HeadersHTML}}
+  <h3 id="{{.Anchor}}-headers">Header参数</h3>
+  {{.HeadersHTML}}
+  {{end}}
+  {{if .PathParamsHTML}}
+  <h3 id="{{.Anchor}}-path-params">路径参数</h3>
+  {{.PathParamsHTML}}
+  {{end}}
+  {{if .QueryParamsHTML}}
+  <h3 id="{{.Anchor}}-query-params">Query参数</h3>
+  {{.QueryParamsHTML}}
+  {{end}}
+  {{if .ReqExample}}
+  <h3 id="{{.Anchor}}-req-example">请求示例</h3>
+  <pre><code>{{.ReqExample}}</code></pre>
+  {{end}}
+  {{if .ReqTableHTML}}
+  <h3 id="{{.Anchor}}-req">请求参数</h3>
+  {{.ReqTableHTML}}
+  {{end}}
+  {{if .ResExample}}
+  <h3 id="{{.Anchor}}-res-example">返回示例</h3>
+  <pre><code>{{.ResExample}}</code></pre>
+  {{end}}
+  {{if .ResTableHTML}}
+  <h3 id="{{.Anchor}}-res-params">返回参数说明</h3>
+  {{.ResTableHTML}}
+  {{end}}
+</div>
+{{end}}

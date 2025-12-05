@@ -1,0 +1,13 @@
+{{define "headings"}}
+{{range .MainGroups}}
+<h1 id="{{.PreId}}">{{.PreName}}</h1>
+  {{template "headingsSub" .Children}}
+{{end}}
+{{end}}
+
+{{define "headingsSub"}}
+{{range .}}
+<h2 id="{{.Id}}">{{.Name}}</h2>
+  {{template "headingsSub" .Children}}
+{{end}}
+{{end}}

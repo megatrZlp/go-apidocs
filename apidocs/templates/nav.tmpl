@@ -1,0 +1,28 @@
+{{define "nav"}}
+<div class="nav">
+  <div class="nav-top" style="display:flex;gap:8px;align-items:center">
+    <button id="expandAll" style="padding:4px 8px;border:1px solid #c7d2fe;background:#eef2ff;border-radius:6px;">全部展开</button>
+    <button id="collapseAll" style="padding:4px 8px;border:1px solid #e5e9f2;background:#f8f9fb;border-radius:6px;">全部收起</button>
+  </div>
+  {{range .Groups}}
+    <details class="grp" open>
+      <summary><a href="#{{.Id}}">{{.Name}}</a></summary>
+      {{range .Children}}
+        {{template "navSubGroup" .}}
+      {{end}}
+    </details>
+  {{end}}
+</div>
+{{end}}
+
+{{define "navSubGroup"}}
+<details class="subgrp" open>
+  <summary><a href="#{{.Id}}">{{.Name}}</a></summary>
+  {{range .Items}}
+    <div class="item"><a class="item-link" href="#{{.Anchor}}">{{.Summary}}</a></div>
+  {{end}}
+  {{range .Children}}
+    {{template "navSubGroup" .}}
+  {{end}}
+</details>
+{{end}}
