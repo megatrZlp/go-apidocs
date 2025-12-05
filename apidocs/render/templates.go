@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
+
+	tpl "github.com/megatrZlp/go-apidocs/apidocs/templates"
 )
 
 func loadTemplateContent(dir string, name string) (string, error) {
@@ -25,6 +27,9 @@ func loadTemplateContent(dir string, name string) (string, error) {
 		if b, err := os.ReadFile(p); err == nil {
 			return string(b), nil
 		}
+	}
+	if s, err := tpl.Read(name); err == nil {
+		return s, nil
 	}
 	return "", os.ErrNotExist
 }
