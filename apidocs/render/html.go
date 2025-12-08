@@ -630,14 +630,14 @@ func paramSchemaType(j *gjson.Json, s *gjson.Json) string {
 		return ""
 	}
 	if r := s.Get("$ref").String(); r != "" {
-		return "object(" + componentNameFromRef(r) + ")"
+		return "object"
 	}
 	t := s.Get("type").String()
 	if t == "array" {
 		it := s.GetJson("items")
 		if it != nil {
 			if r := it.Get("$ref").String(); r != "" {
-				return "array(object(" + componentNameFromRef(r) + "))"
+				return "array(object)"
 			}
 			itt := it.Get("type").String()
 			if it.Get("format").String() != "" {

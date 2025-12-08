@@ -19,6 +19,21 @@ func sanitizeType(t string) string {
 	return t
 }
 
+func titleDescription(s *gjson.Json) string {
+	if s == nil {
+		return ""
+	}
+	t := strings.TrimSpace(s.Get("title").String())
+	d := strings.TrimSpace(s.Get("description").String())
+	if t != "" && d != "" {
+		return t + " " + d
+	}
+	if t != "" {
+		return t
+	}
+	return d
+}
+
 // mergedProperties 合并 schema 的属性集：当 properties 为空时，
 // 会遍历 allOf/oneOf/anyOf 的每个元素并递归解析 $ref，最终返回统一的属性映射。
 func mergedProperties(j *gjson.Json, s *gjson.Json) map[string]*gjson.Json {
@@ -374,13 +389,13 @@ func renderResponseParamFlatTableHTMLFromJson(j *gjson.Json, sj *gjson.Json) str
 					p := props[k]
 					t := p.Get("type").String()
 					if rr := p.Get("$ref").String(); rr != "" {
-						t = "object(" + componentNameFromRef(rr) + ")"
+						t = "object"
 					}
 					if t == "array" {
 						it2 := p.GetJson("items")
 						if it2 != nil {
 							if r2 := it2.Get("$ref").String(); r2 != "" {
-								t = "array(object(" + componentNameFromRef(r2) + "))"
+								t = "array(object)"
 							} else if it2.Get("type").String() != "" {
 								t = "array(" + it2.Get("type").String() + ")"
 							} else {
@@ -634,7 +649,7 @@ func renderResponseParamFlatTableHTMLFromJsonWithAllowed(j *gjson.Json, sj *gjso
 			it := target.GetJson("items")
 			if it != nil {
 				if r := it.Get("$ref").String(); r != "" {
-					tt = "array(object(" + componentNameFromRef(r) + "))"
+					tt = "array(object)"
 				} else if it.Get("type").String() != "" {
 					tt = "array(" + it.Get("type").String() + ")"
 				} else {
@@ -662,12 +677,12 @@ func renderResponseParamFlatTableHTMLFromJsonWithAllowed(j *gjson.Json, sj *gjso
 			p := top[k]
 			t := p.Get("type").String()
 			if r := p.Get("$ref").String(); r != "" {
-				t = "object(" + componentNameFromRef(r) + ")"
+				t = "object"
 			} else if t == "array" {
 				it0 := p.GetJson("items")
 				if it0 != nil {
 					if r0 := it0.Get("$ref").String(); r0 != "" {
-						t = "array(object(" + componentNameFromRef(r0) + "))"
+						t = "array(object)"
 					} else if it0.Get("type").String() != "" {
 						t = "array(" + it0.Get("type").String() + ")"
 					} else {
@@ -691,13 +706,13 @@ func renderResponseParamFlatTableHTMLFromJsonWithAllowed(j *gjson.Json, sj *gjso
 					for k, p := range mergedProperties(j, sub) {
 						t := p.Get("type").String()
 						if rr := p.Get("$ref").String(); rr != "" {
-							t = "object(" + componentNameFromRef(rr) + ")"
+							t = "object"
 						}
 						if t == "array" {
 							it2 := p.GetJson("items")
 							if it2 != nil {
 								if r2 := it2.Get("$ref").String(); r2 != "" {
-									t = "array(object(" + componentNameFromRef(r2) + "))"
+									t = "array(object)"
 								} else if it2.Get("type").String() != "" {
 									t = "array(" + it2.Get("type").String() + ")"
 								} else {
@@ -721,13 +736,13 @@ func renderResponseParamFlatTableHTMLFromJsonWithAllowed(j *gjson.Json, sj *gjso
 					p := props[k]
 					t := p.Get("type").String()
 					if rr := p.Get("$ref").String(); rr != "" {
-						t = "object(" + componentNameFromRef(rr) + ")"
+						t = "object"
 					}
 					if t == "array" {
 						it2 := p.GetJson("items")
 						if it2 != nil {
 							if r2 := it2.Get("$ref").String(); r2 != "" {
-								t = "array(object(" + componentNameFromRef(r2) + "))"
+								t = "array(object)"
 							} else if it2.Get("type").String() != "" {
 								t = "array(" + it2.Get("type").String() + ")"
 							} else {
@@ -763,19 +778,19 @@ func renderResponseParamFlatTableHTMLFromJsonWithAllowed(j *gjson.Json, sj *gjso
 			}
 			t := p.Get("type").String()
 			if r := p.Get("$ref").String(); r != "" {
-				fields = append(fields, FieldInfo{Path: cur, Type: "object(" + componentNameFromRef(r) + ")", Desc: p.Get("description").String()})
+				fields = append(fields, FieldInfo{Path: cur, Type: "object", Desc: p.Get("description").String()})
 				sub := getRefJson(j, r)
 				if sub != nil {
 					for sk, sp := range mergedProperties(j, sub) {
 						st := sp.Get("type").String()
 						if rr := sp.Get("$ref").String(); rr != "" {
-							st = "object(" + componentNameFromRef(rr) + ")"
+							st = "object"
 						}
 						if st == "array" {
 							it2 := sp.GetJson("items")
 							if it2 != nil {
 								if r2 := it2.Get("$ref").String(); r2 != "" {
-									st = "array(object(" + componentNameFromRef(r2) + "))"
+									st = "array(object)"
 								} else if it2.Get("type").String() != "" {
 									st = "array(" + it2.Get("type").String() + ")"
 								} else {
@@ -794,19 +809,19 @@ func renderResponseParamFlatTableHTMLFromJsonWithAllowed(j *gjson.Json, sj *gjso
 				it := p.GetJson("items")
 				if it != nil {
 					if r2 := it.Get("$ref").String(); r2 != "" {
-						fields = append(fields, FieldInfo{Path: cur + "[]", Type: "array(object(" + componentNameFromRef(r2) + "))", Desc: p.Get("description").String()})
+						fields = append(fields, FieldInfo{Path: cur + "[]", Type: "array(object)", Desc: p.Get("description").String()})
 						sub := getRefJson(j, r2)
 						if sub != nil {
 							for sk, sp := range sub.GetJsonMap("properties") {
 								st := sp.Get("type").String()
 								if rr := sp.Get("$ref").String(); rr != "" {
-									st = "object(" + componentNameFromRef(rr) + ")"
+									st = "object"
 								}
 								if st == "array" {
 									it2 := sp.GetJson("items")
 									if it2 != nil {
 										if r3 := it2.Get("$ref").String(); r3 != "" {
-											st = "array(object(" + componentNameFromRef(r3) + "))"
+											st = "array(object)"
 										} else if it2.Get("type").String() != "" {
 											st = "array(" + it2.Get("type").String() + ")"
 										} else {
@@ -832,13 +847,13 @@ func renderResponseParamFlatTableHTMLFromJsonWithAllowed(j *gjson.Json, sj *gjso
 							sp := props2[kk]
 							st := sp.Get("type").String()
 							if rr := sp.Get("$ref").String(); rr != "" {
-								st = "object(" + componentNameFromRef(rr) + ")"
+								st = "object"
 							}
 							if st == "array" {
 								it3 := sp.GetJson("items")
 								if it3 != nil {
 									if r3 := it3.Get("$ref").String(); r3 != "" {
-										st = "array(object(" + componentNameFromRef(r3) + "))"
+										st = "array(object)"
 									} else if it3.Get("type").String() != "" {
 										st = "array(" + it3.Get("type").String() + ")"
 									} else {
@@ -937,13 +952,13 @@ func renderResponseParamFlatTableMarkdownFromJson(j *gjson.Json, sj *gjson.Json)
 			p := top[k]
 			t := p.Get("type").String()
 			if r := p.Get("$ref").String(); r != "" {
-				t = "object(" + componentNameFromRef(r) + ")"
+				t = "object"
 			}
 			if t == "array" {
 				it0 := p.GetJson("items")
 				if it0 != nil {
 					if r0 := it0.Get("$ref").String(); r0 != "" {
-						t = "array(object(" + componentNameFromRef(r0) + "))"
+						t = "array(object)"
 					} else if it0.Get("type").String() != "" {
 						t = "array(" + it0.Get("type").String() + ")"
 					} else {
@@ -967,13 +982,13 @@ func renderResponseParamFlatTableMarkdownFromJson(j *gjson.Json, sj *gjson.Json)
 					for k, p := range mergedProperties(j, sub) {
 						t := p.Get("type").String()
 						if rr := p.Get("$ref").String(); rr != "" {
-							t = "object(" + componentNameFromRef(rr) + ")"
+							t = "object"
 						}
 						if t == "array" {
 							it2 := p.GetJson("items")
 							if it2 != nil {
 								if r2 := it2.Get("$ref").String(); r2 != "" {
-									t = "array(object(" + componentNameFromRef(r2) + "))"
+									t = "array(object)"
 								} else if it2.Get("type").String() != "" {
 									t = "array(" + it2.Get("type").String() + ")"
 								} else {
@@ -997,13 +1012,13 @@ func renderResponseParamFlatTableMarkdownFromJson(j *gjson.Json, sj *gjson.Json)
 					p := props[k]
 					t := p.Get("type").String()
 					if rr := p.Get("$ref").String(); rr != "" {
-						t = "object(" + componentNameFromRef(rr) + ")"
+						t = "object"
 					}
 					if t == "array" {
 						it2 := p.GetJson("items")
 						if it2 != nil {
 							if r2 := it2.Get("$ref").String(); r2 != "" {
-								t = "array(object(" + componentNameFromRef(r2) + "))"
+								t = "array(object)"
 							} else if it2.Get("type").String() != "" {
 								t = "array(" + it2.Get("type").String() + ")"
 							} else {
@@ -1039,19 +1054,19 @@ func renderResponseParamFlatTableMarkdownFromJson(j *gjson.Json, sj *gjson.Json)
 			}
 			t := p.Get("type").String()
 			if r := p.Get("$ref").String(); r != "" {
-				fields = append(fields, FieldInfo{Path: cur, Type: "object(" + componentNameFromRef(r) + ")", Desc: p.Get("description").String()})
+				fields = append(fields, FieldInfo{Path: cur, Type: "object", Desc: p.Get("description").String()})
 				sub := getRefJson(j, r)
 				if sub != nil {
 					for sk, sp := range mergedProperties(j, sub) {
 						st := sp.Get("type").String()
 						if rr := sp.Get("$ref").String(); rr != "" {
-							st = "object(" + componentNameFromRef(rr) + ")"
+							st = "object"
 						}
 						if st == "array" {
 							it2 := sp.GetJson("items")
 							if it2 != nil {
 								if r2 := it2.Get("$ref").String(); r2 != "" {
-									st = "array(object(" + componentNameFromRef(r2) + "))"
+									st = "array(object)"
 								} else if it2.Get("type").String() != "" {
 									st = "array(" + it2.Get("type").String() + ")"
 								} else {
@@ -1070,19 +1085,19 @@ func renderResponseParamFlatTableMarkdownFromJson(j *gjson.Json, sj *gjson.Json)
 				it := p.GetJson("items")
 				if it != nil {
 					if r2 := it.Get("$ref").String(); r2 != "" {
-						fields = append(fields, FieldInfo{Path: cur + "[]", Type: "array(object(" + componentNameFromRef(r2) + "))", Desc: p.Get("description").String()})
+						fields = append(fields, FieldInfo{Path: cur + "[]", Type: "array(object)", Desc: p.Get("description").String()})
 						sub := getRefJson(j, r2)
 						if sub != nil {
 							for sk, sp := range mergedProperties(j, sub) {
 								st := sp.Get("type").String()
 								if rr := sp.Get("$ref").String(); rr != "" {
-									st = "object(" + componentNameFromRef(rr) + ")"
+									st = "object"
 								}
 								if st == "array" {
 									it2 := sp.GetJson("items")
 									if it2 != nil {
 										if r3 := it2.Get("$ref").String(); r3 != "" {
-											st = "array(object(" + componentNameFromRef(r3) + "))"
+											st = "array(object)"
 										} else if it2.Get("type").String() != "" {
 											st = "array(" + it2.Get("type").String() + ")"
 										} else {
@@ -1108,13 +1123,13 @@ func renderResponseParamFlatTableMarkdownFromJson(j *gjson.Json, sj *gjson.Json)
 							sp := props2[kk]
 							st := sp.Get("type").String()
 							if rr := sp.Get("$ref").String(); rr != "" {
-								st = "object(" + componentNameFromRef(rr) + ")"
+								st = "object"
 							}
 							if st == "array" {
 								it3 := sp.GetJson("items")
 								if it3 != nil {
 									if r3 := it3.Get("$ref").String(); r3 != "" {
-										st = "array(object(" + componentNameFromRef(r3) + "))"
+										st = "array(object)"
 									} else if it3.Get("type").String() != "" {
 										st = "array(" + it3.Get("type").String() + ")"
 									} else {
@@ -1183,7 +1198,7 @@ func renderResponseParamFlatTableMarkdownFromJsonWithAllowed(j *gjson.Json, sj *
 			it := target.GetJson("items")
 			if it != nil {
 				if r := it.Get("$ref").String(); r != "" {
-					t = "array(object(" + componentNameFromRef(r) + "))"
+					t = "array(object)"
 				} else if it.Get("type").String() != "" {
 					t = "array(" + it.Get("type").String() + ")"
 				} else {
@@ -1211,12 +1226,12 @@ func renderResponseParamFlatTableMarkdownFromJsonWithAllowed(j *gjson.Json, sj *
 			p := top[k]
 			t := p.Get("type").String()
 			if r := p.Get("$ref").String(); r != "" {
-				t = "object(" + componentNameFromRef(r) + ")"
+				t = "object"
 			} else if t == "array" {
 				it0 := p.GetJson("items")
 				if it0 != nil {
 					if r0 := it0.Get("$ref").String(); r0 != "" {
-						t = "array(object(" + componentNameFromRef(r0) + "))"
+						t = "array(object)"
 					} else if it0.Get("type").String() != "" {
 						t = "array(" + it0.Get("type").String() + ")"
 					} else {
@@ -1240,13 +1255,13 @@ func renderResponseParamFlatTableMarkdownFromJsonWithAllowed(j *gjson.Json, sj *
 					for k, p := range sub.GetJsonMap("properties") {
 						t := p.Get("type").String()
 						if rr := p.Get("$ref").String(); rr != "" {
-							t = "object(" + componentNameFromRef(rr) + ")"
+							t = "object"
 						}
 						if t == "array" {
 							it2 := p.GetJson("items")
 							if it2 != nil {
 								if r2 := it2.Get("$ref").String(); r2 != "" {
-									t = "array(object(" + componentNameFromRef(r2) + "))"
+									t = "array(object)"
 								} else if it2.Get("type").String() != "" {
 									t = "array(" + it2.Get("type").String() + ")"
 								} else {
@@ -1270,13 +1285,13 @@ func renderResponseParamFlatTableMarkdownFromJsonWithAllowed(j *gjson.Json, sj *
 					p := props[k]
 					t := p.Get("type").String()
 					if rr := p.Get("$ref").String(); rr != "" {
-						t = "object(" + componentNameFromRef(rr) + ")"
+						t = "object"
 					}
 					if t == "array" {
 						it2 := p.GetJson("items")
 						if it2 != nil {
 							if r2 := it2.Get("$ref").String(); r2 != "" {
-								t = "array(object(" + componentNameFromRef(r2) + "))"
+								t = "array(object)"
 							} else if it2.Get("type").String() != "" {
 								t = "array(" + it2.Get("type").String() + ")"
 							} else {
@@ -1312,19 +1327,19 @@ func renderResponseParamFlatTableMarkdownFromJsonWithAllowed(j *gjson.Json, sj *
 			}
 			t := p.Get("type").String()
 			if r := p.Get("$ref").String(); r != "" {
-				fields = append(fields, FieldInfo{Path: cur, Type: "object(" + componentNameFromRef(r) + ")", Desc: p.Get("description").String()})
+				fields = append(fields, FieldInfo{Path: cur, Type: "object", Desc: p.Get("description").String()})
 				sub := getRefJson(j, r)
 				if sub != nil {
 					for sk, sp := range sub.GetJsonMap("properties") {
 						st := sp.Get("type").String()
 						if rr := sp.Get("$ref").String(); rr != "" {
-							st = "object(" + componentNameFromRef(rr) + ")"
+							st = "object"
 						}
 						if st == "array" {
 							it2 := sp.GetJson("items")
 							if it2 != nil {
 								if r2 := it2.Get("$ref").String(); r2 != "" {
-									st = "array(object(" + componentNameFromRef(r2) + "))"
+									st = "array(object)"
 								} else if it2.Get("type").String() != "" {
 									st = "array(" + it2.Get("type").String() + ")"
 								} else {
@@ -1343,19 +1358,19 @@ func renderResponseParamFlatTableMarkdownFromJsonWithAllowed(j *gjson.Json, sj *
 				it := p.GetJson("items")
 				if it != nil {
 					if r2 := it.Get("$ref").String(); r2 != "" {
-						fields = append(fields, FieldInfo{Path: cur + "[]", Type: "array(object(" + componentNameFromRef(r2) + "))", Desc: p.Get("description").String()})
+						fields = append(fields, FieldInfo{Path: cur + "[]", Type: "array(object)", Desc: p.Get("description").String()})
 						sub := getRefJson(j, r2)
 						if sub != nil {
 							for sk, sp := range sub.GetJsonMap("properties") {
 								st := sp.Get("type").String()
 								if rr := sp.Get("$ref").String(); rr != "" {
-									st = "object(" + componentNameFromRef(rr) + ")"
+									st = "object"
 								}
 								if st == "array" {
 									it2 := sp.GetJson("items")
 									if it2 != nil {
 										if r3 := it2.Get("$ref").String(); r3 != "" {
-											st = "array(object(" + componentNameFromRef(r3) + "))"
+											st = "array(object)"
 										} else if it2.Get("type").String() != "" {
 											st = "array(" + it2.Get("type").String() + ")"
 										} else {
@@ -1381,13 +1396,13 @@ func renderResponseParamFlatTableMarkdownFromJsonWithAllowed(j *gjson.Json, sj *
 							sp := props2[kk]
 							st := sp.Get("type").String()
 							if rr := sp.Get("$ref").String(); rr != "" {
-								st = "object(" + componentNameFromRef(rr) + ")"
+								st = "object"
 							}
 							if st == "array" {
 								it3 := sp.GetJson("items")
 								if it3 != nil {
 									if r3 := it3.Get("$ref").String(); r3 != "" {
-										st = "array(object(" + componentNameFromRef(r3) + "))"
+										st = "array(object)"
 									} else if it3.Get("type").String() != "" {
 										st = "array(" + it3.Get("type").String() + ")"
 									} else {
@@ -1442,7 +1457,7 @@ func flattenSchemaFields(j *gjson.Json, ref string, prefix string) []FieldInfo {
 		pj := props[k]
 		req := requiredSet[k]
 		typ := pj.Get("type").String()
-		desc := pj.Get("description").String()
+		desc := titleDescription(pj)
 		ref2 := pj.Get("$ref").String()
 		curPath := k
 		if prefix != "" {
@@ -1452,9 +1467,45 @@ func flattenSchemaFields(j *gjson.Json, ref string, prefix string) []FieldInfo {
 			it := pj.GetJson("items")
 			if it != nil {
 				if r := it.Get("$ref").String(); r != "" {
-					fields = append(fields, FieldInfo{Path: curPath + "[]", Required: req, Type: "array(object(" + componentNameFromRef(r) + "))", Desc: desc})
+					fields = append(fields, FieldInfo{Path: curPath + "[]", Required: req, Type: "array(object)", Desc: desc})
 					sub := flattenSchemaFields(j, r, curPath+"[]")
 					fields = append(fields, sub...)
+					continue
+				}
+				inlineObj := it.Get("type").String() == "object" || len(it.GetJsonMap("properties")) > 0 || len(it.Get("allOf").Array()) > 0 || len(it.Get("oneOf").Array()) > 0 || len(it.Get("anyOf").Array()) > 0
+				if inlineObj {
+					fields = append(fields, FieldInfo{Path: curPath + "[]", Required: req, Type: "array(object)", Desc: desc})
+					props2 := mergedProperties(j, it)
+					itemReq := setFromArray(it.Get("required").Array())
+					k2 := make([]string, 0, len(props2))
+					for kk := range props2 {
+						k2 = append(k2, kk)
+					}
+					sortStrings(k2)
+					for _, kk := range k2 {
+						sp := props2[kk]
+						st := sp.Get("type").String()
+						if rr := sp.Get("$ref").String(); rr != "" {
+							st = "object"
+						}
+						if st == "array" {
+							it3 := sp.GetJson("items")
+							if it3 != nil {
+								if r3 := it3.Get("$ref").String(); r3 != "" {
+									st = "array(object)"
+								} else if it3.Get("type").String() != "" {
+									st = "array(" + it3.Get("type").String() + ")"
+								} else {
+									st = "array"
+								}
+							} else {
+								st = "array"
+							}
+						} else if st == "" {
+							st = "object"
+						}
+						fields = append(fields, FieldInfo{Path: curPath + "[]." + kk, Required: itemReq[kk], Type: st, Desc: titleDescription(sp)})
+					}
 					continue
 				}
 				fields = append(fields, FieldInfo{Path: curPath + "[]", Required: req, Type: "array(" + it.Get("type").String() + ")", Desc: desc})
@@ -1464,7 +1515,7 @@ func flattenSchemaFields(j *gjson.Json, ref string, prefix string) []FieldInfo {
 			continue
 		}
 		if ref2 != "" {
-			fields = append(fields, FieldInfo{Path: curPath, Required: req, Type: "object(" + componentNameFromRef(ref2) + ")", Desc: desc})
+			fields = append(fields, FieldInfo{Path: curPath, Required: req, Type: "object", Desc: desc})
 			sub := flattenSchemaFields(j, ref2, curPath)
 			fields = append(fields, sub...)
 			continue
@@ -1483,14 +1534,14 @@ func flattenSchemaFields(j *gjson.Json, ref string, prefix string) []FieldInfo {
 					np := nestedProps[nk]
 					nreq := nestedReq[nk]
 					ntyp := np.Get("type").String()
-					ndesc := np.Get("description").String()
+					ndesc := titleDescription(np)
 					nref := np.Get("$ref").String()
 					npath := curPath + "." + nk
 					if ntyp == "array" {
 						it := np.GetJson("items")
 						if it != nil {
 							if r := it.Get("$ref").String(); r != "" {
-								fields = append(fields, FieldInfo{Path: npath + "[]", Required: nreq, Type: "array(object(" + componentNameFromRef(r) + "))", Desc: ndesc})
+								fields = append(fields, FieldInfo{Path: npath + "[]", Required: nreq, Type: "array(object)", Desc: ndesc})
 								sub := flattenSchemaFields(j, r, npath+"[]")
 								fields = append(fields, sub...)
 								continue
@@ -1502,7 +1553,7 @@ func flattenSchemaFields(j *gjson.Json, ref string, prefix string) []FieldInfo {
 						continue
 					}
 					if nref != "" {
-						fields = append(fields, FieldInfo{Path: npath, Required: nreq, Type: "object(" + componentNameFromRef(nref) + ")", Desc: ndesc})
+						fields = append(fields, FieldInfo{Path: npath, Required: nreq, Type: "object", Desc: ndesc})
 						sub := flattenSchemaFields(j, nref, npath)
 						fields = append(fields, sub...)
 						continue
@@ -1553,7 +1604,7 @@ func flattenSchemaFieldsFromJson(j *gjson.Json, sj *gjson.Json, prefix string) [
 		pj := props[k]
 		req := requiredSet[k]
 		typ := pj.Get("type").String()
-		desc := pj.Get("description").String()
+		desc := titleDescription(pj)
 		ref2 := pj.Get("$ref").String()
 		curPath := k
 		if prefix != "" {
@@ -1563,10 +1614,46 @@ func flattenSchemaFieldsFromJson(j *gjson.Json, sj *gjson.Json, prefix string) [
 			it := pj.GetJson("items")
 			if it != nil {
 				if r := it.Get("$ref").String(); r != "" {
-					fields = append(fields, FieldInfo{Path: curPath + "[]", Required: req, Type: "array(object(" + componentNameFromRef(r) + "))", Desc: desc})
+					fields = append(fields, FieldInfo{Path: curPath + "[]", Required: req, Type: "array(object)", Desc: desc})
 					sub := getRefJson(j, r)
 					if sub != nil {
 						fields = append(fields, flattenSchemaFieldsFromJson(j, sub, curPath+"[]")...)
+					}
+					continue
+				}
+				inlineObj := it.Get("type").String() == "object" || len(it.GetJsonMap("properties")) > 0 || len(it.Get("allOf").Array()) > 0 || len(it.Get("oneOf").Array()) > 0 || len(it.Get("anyOf").Array()) > 0
+				if inlineObj {
+					fields = append(fields, FieldInfo{Path: curPath + "[]", Required: req, Type: "array(object)", Desc: desc})
+					props2 := mergedProperties(j, it)
+					itemReq := setFromArray(it.Get("required").Array())
+					k2 := make([]string, 0, len(props2))
+					for kk := range props2 {
+						k2 = append(k2, kk)
+					}
+					sortStrings(k2)
+					for _, kk := range k2 {
+						sp := props2[kk]
+						st := sp.Get("type").String()
+						if rr := sp.Get("$ref").String(); rr != "" {
+							st = "object"
+						}
+						if st == "array" {
+							it3 := sp.GetJson("items")
+							if it3 != nil {
+								if r3 := it3.Get("$ref").String(); r3 != "" {
+									st = "array(object)"
+								} else if it3.Get("type").String() != "" {
+									st = "array(" + it3.Get("type").String() + ")"
+								} else {
+									st = "array"
+								}
+							} else {
+								st = "array"
+							}
+						} else if st == "" {
+							st = "object"
+						}
+						fields = append(fields, FieldInfo{Path: curPath + "[]." + kk, Required: itemReq[kk], Type: st, Desc: titleDescription(sp)})
 					}
 					continue
 				}
@@ -1577,7 +1664,7 @@ func flattenSchemaFieldsFromJson(j *gjson.Json, sj *gjson.Json, prefix string) [
 			continue
 		}
 		if ref2 != "" {
-			fields = append(fields, FieldInfo{Path: curPath, Required: req, Type: "object(" + componentNameFromRef(ref2) + ")", Desc: desc})
+			fields = append(fields, FieldInfo{Path: curPath, Required: req, Type: "object", Desc: desc})
 			sub := getRefJson(j, ref2)
 			if sub != nil {
 				fields = append(fields, flattenSchemaFieldsFromJson(j, sub, curPath)...)

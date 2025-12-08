@@ -80,7 +80,7 @@ func exampleValueFromSchema(j *gjson.Json, sj *gjson.Json) interface{} {
 			if r2 := it.Get("$ref").String(); r2 != "" {
 				sub := getRefJson(j, r2)
 				return []interface{}{exampleValueFromSchema(j, sub)}
-			} else if it.Get("type").String() == "object" {
+			} else if it.Get("type").String() == "object" || len(it.GetJsonMap("properties")) > 0 || len(it.Get("allOf").Array()) > 0 || len(it.Get("oneOf").Array()) > 0 || len(it.Get("anyOf").Array()) > 0 {
 				return []interface{}{exampleValueFromSchema(j, it)}
 			} else {
 				return []interface{}{}
@@ -115,7 +115,7 @@ func exampleValueFromSchema(j *gjson.Json, sj *gjson.Json) interface{} {
 					if r2 := it.Get("$ref").String(); r2 != "" {
 						sub := getRefJson(j, r2)
 						m[k] = []interface{}{exampleValueFromSchema(j, sub)}
-					} else if it.Get("type").String() == "object" {
+					} else if it.Get("type").String() == "object" || len(it.GetJsonMap("properties")) > 0 || len(it.Get("allOf").Array()) > 0 || len(it.Get("oneOf").Array()) > 0 || len(it.Get("anyOf").Array()) > 0 {
 						m[k] = []interface{}{exampleValueFromSchema(j, it)}
 					} else {
 						m[k] = []interface{}{}

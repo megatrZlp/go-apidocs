@@ -13,7 +13,6 @@ func main() {
 		Domain: "127.0.0.1",
 		Port:   10014,
 		Path:   "/server/swagger/api.json",
-		//TemplateDir: "apidocs/templates_custom",
 	})
 	s.SetPort(8000)
 	s.Run()
